@@ -49,6 +49,11 @@ model = Pipeline(steps=[('preprocessor', preprocessor),
 
 # Fit the model
 model.fit(X_train, y_train)
+# Visualize survival rate by passenger class
+sns.barplot(x='Pclass', y='Survived', data=titanic_df)
+plt.title('Survival Rate by Passenger Class')
+plt.show()
+
 
 # Predict on the test set
 y_pred = model.predict(X_test)
