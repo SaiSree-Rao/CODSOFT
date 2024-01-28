@@ -61,3 +61,7 @@ y_pred = model.predict(X_test)
 # Evaluate the model
 accuracy = accuracy_score(y_test, y_pred)
 print("Accuracy:", accuracy)
+# Visualize survival rate by passenger class
+sns.barplot(x='Pclass', y='Survived', data=titanic_df)
+plt.title('Survival Rate by Passenger Class')
+plt.show()
