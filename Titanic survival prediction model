@@ -1,0 +1,64 @@
+# Titanic Survival Prediction Model
+
+# Importing necessary libraries
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+
+# Load the dataset
+titanic_data = pd.read_csv("titanic.csv")
+
+# Data preprocessing
+titanic_data.drop(["PassengerId", "Name", "Ticket", "Cabin"], axis=1, inplace=True)
+titanic_data["Age"].fillna(titanic_data["Age"].median(), inplace=True)
+titanic_data["Embarked"].fillna(titanic_data["Embarked"].mode()[0], inplace=True)
+titanic_data.dropna(inplace=True)
+
+# Encode categorical variables
+titanic_data = pd.get_dummies(titanic_data, columns=["Sex", "Embarked"], drop_first=True)
+
+# Split data into features and target variable
+X = titanic_data.drop("Survived", axis=1)
+y = titanic_data["Survived"]
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the Random Forest model
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(X_train, y_train)
+
+# Predictions
+y_pred_train = rf_model.predict(X_train)
+y_pred_test = rf_model.predict(X_test)
+
+# Evaluate the model
+train_accuracy = accuracy_score(y_train, y_pred_train)
+test_accuracy = accuracy_score(y_test, y_pred_test)
+print("Training Accuracy:", train_accuracy)
+print("Testing Accuracy:", test_accuracy)
+
+# Confusion matrix
+cm = confusion_matrix(y_test, y_pred_test)
+sns.heatmap(cm, annot=True, fmt='g', cmap='Blues')
+plt.xlabel('Predicted')
+plt.ylabel('Actual')
+plt.title('Confusion Matrix')
+plt.show()
+
+# Classification report
+print(classification_report(y_test, y_pred_test))
+
+# Feature importance
+feature_importance = pd.DataFrame({"Feature": X_train.columns, "Importance": rf_model.feature_importances_})
+feature_importance = feature_importance.sort_values(by="Importance", ascending=False)
+plt.figure(figsize=(10, 6))
+sns.barplot(x=feature_importance["Importance"], y=feature_importance["Feature"])
+plt.xlabel("Importance")
+plt.ylabel("Feature")
+plt.title("Feature Importance")
+plt.show()
